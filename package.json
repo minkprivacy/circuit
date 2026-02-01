@@ -1,0 +1,47 @@
+{
+  "name": "@minkprivacy/circuits",
+  "version": "0.1.0",
+  "description": "Zero-knowledge circuits for the Mink privacy protocol on Solana",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/minkprivacy/circuits"
+  },
+  "scripts": {
+    "download:ptau": "curl -L -o pot17_final.ptau https://storage.googleapis.com/zkevm/ptau/powersOfTau28_hez_final_17.ptau",
+
+    "compile:stealth": "circom core/stealth_tx.circom --r1cs --wasm --sym -l node_modules -o artifacts/",
+    "compile:inbox": "circom core/inbox_registration.circom --r1cs --wasm --sym -l node_modules -o artifacts/",
+    "compile:viewing": "circom core/viewing_key.circom --r1cs --wasm --sym -l node_modules -o artifacts/",
+    "compile:all": "pnpm compile:stealth && pnpm compile:inbox && pnpm compile:viewing",
+
+    "setup:stealth": "npx snarkjs groth16 setup artifacts/stealth_tx.r1cs pot17_final.ptau artifacts/stealth_tx_0000.zkey",
+    "setup:inbox": "npx snarkjs groth16 setup artifacts/inbox_registration.r1cs pot17_final.ptau artifacts/inbox_registration_0000.zkey",
+    "setup:viewing": "npx snarkjs groth16 setup artifacts/viewing_key.r1cs pot17_final.ptau artifacts/viewing_key_0000.zkey",
+    "setup:all": "pnpm setup:stealth && pnpm setup:inbox && pnpm setup:viewing",
+
+    "contribute:stealth": "npx snarkjs zkey contribute artifacts/stealth_tx_0000.zkey artifacts/stealth_tx_final.zkey --name='mink' -v",
+    "contribute:inbox": "npx snarkjs zkey contribute artifacts/inbox_registration_0000.zkey artifacts/inbox_registration_final.zkey --name='mink' -v",
+    "contribute:viewing": "npx snarkjs zkey contribute artifacts/viewing_key_0000.zkey artifacts/viewing_key_final.zkey --name='mink' -v",
+    "contribute:all": "pnpm contribute:stealth && pnpm contribute:inbox && pnpm contribute:viewing",
+
+    "export-vkey:stealth": "npx snarkjs zkey export verificationkey artifacts/stealth_tx_final.zkey artifacts/stealth_tx_vkey.json",
+    "export-vkey:inbox": "npx snarkjs zkey export verificationkey artifacts/inbox_registration_final.zkey artifacts/inbox_registration_vkey.json",
+    "export-vkey:viewing": "npx snarkjs zkey export verificationkey artifacts/viewing_key_final.zkey artifacts/viewing_key_vkey.json",
+    "export-vkey:all": "pnpm export-vkey:stealth && pnpm export-vkey:inbox && pnpm export-vkey:viewing",
+
+    "build:stealth": "pnpm compile:stealth && pnpm setup:stealth && pnpm contribute:stealth && pnpm export-vkey:stealth",
+    "build:inbox": "pnpm compile:inbox && pnpm setup:inbox && pnpm contribute:inbox && pnpm export-vkey:inbox",
+    "build:viewing": "pnpm compile:viewing && pnpm setup:viewing && pnpm contribute:viewing && pnpm export-vkey:viewing",
+    "build:all": "pnpm build:stealth && pnpm build:inbox && pnpm build:viewing",
+
+    "convert-vkey": "node scripts/convert_vkey.cjs",
+    "convert-vkey:all": "node scripts/convert_vkey.cjs --all"
+  },
+  "dependencies": {
+    "circomlib": "^2.0.5"
+  },
+  "devDependencies": {
+    "snarkjs": "^0.7.4"
+  }
+}
