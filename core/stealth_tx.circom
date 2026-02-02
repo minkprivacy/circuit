@@ -51,10 +51,15 @@ template StealthTransaction(levels, nIns, nOuts) {
     component inNullifierHasher[nIns];
     component inTree[nIns];
     component inCheckRoot[nIns];
+    component inAmountCheck[nIns];
     var sumIns = 0;
 
     // Verify input UTXOs
     for (var tx = 0; tx < nIns; tx++) {
+        // Range check: input amount must fit in 248 bits (prevents field overflow attacks)
+        inAmountCheck[tx] = Num2Bits(248);
+        inAmountCheck[tx].in <== inAmount[tx];
+
         // Derive public key from private key
         inKeypair[tx] = Keypair();
         inKeypair[tx].privateKey <== inPrivateKey[tx];

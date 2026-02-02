@@ -43,7 +43,7 @@ const CIRCUITS = {
 };
 
 const ARTIFACTS_DIR = path.join(__dirname, '..', 'artifacts');
-const OUTPUT_DIR = path.join(__dirname, '..', '..', 'program', 'programs', 'mink_privacy', 'src', 'verifier');
+const OUTPUT_DIR = path.join(__dirname, '..', '..', 'programs', 'programs', 'mink_privacy', 'src', 'verifier');
 
 /**
  * Convert a decimal string to a big-endian hex string (32 bytes)
